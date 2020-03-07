@@ -21,6 +21,7 @@ fn from_word_type() {
   assert_eq!(Subject::Xor(1, 1), Subject::from(0b0000001000110000));
   assert_eq!(Subject::Not(1), Subject::from(0b0000000000110001));
   assert_eq!(Subject::Jump(1, 0), Subject::from(0b0000000000110010));
+  assert_eq!(Subject::Interrupt(1), Subject::from(0b0000000100110011));
   assert_eq!(Subject::BitShiftLeft(1, 1), Subject::from(0b0000001000110101));
   assert_eq!(Subject::BitShiftRight(1, 1), Subject::from(0b0000001000110110));
   assert_eq!(Subject::BitNot(1), Subject::from(0b0000000000110111));
@@ -53,6 +54,7 @@ fn from_instruction() {
   assert_eq!(0b0000001000110000, WordType::from(Subject::Xor(1, 1)));
   assert_eq!(0b0000000000110001, WordType::from(Subject::Not(1)));
   assert_eq!(0b0000000000110010, WordType::from(Subject::Jump(1, 0)));
+  assert_eq!(0b0000111100010011, WordType::from(Subject::Interrupt(15)));
   assert_eq!(0b0000001000110101, WordType::from(Subject::BitShiftLeft(1, 1)));
   assert_eq!(0b0000001000110110, WordType::from(Subject::BitShiftRight(1, 1)));
   assert_eq!(0b0000000000110111, WordType::from(Subject::BitNot(1)));
@@ -60,7 +62,7 @@ fn from_instruction() {
   assert_eq!(0b0000001000111001, WordType::from(Subject::BitAnd(1, 1)));
   assert_eq!(0b0000001000111010, WordType::from(Subject::BitOr(1, 1)));
   assert_eq!(0b0000001000111011, WordType::from(Subject::BitNor(1, 1)));
-  println!("{:#b}", WordType::from(Subject::LoadRelative(-2)));
   assert_eq!(0b1111111000011100, WordType::from(Subject::LoadRelative(-2)));
   assert_eq!(0b1111111000111101, WordType::from(Subject::JumpRelative(-2, 1)));
+  assert_eq!(0b0000000100011110, WordType::from(Subject::SaveRelative(1)));
 }

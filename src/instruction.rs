@@ -9,8 +9,8 @@ const REGISTER_MASK: WordType = 0x0F;
 const JUMP_FLAG_OFFSET: usize = 5;
 const JUMP_FLAG_MASK: WordType = 0x00E0;
 
-const RELATIVE_OFFSET: usize = 8;
-const RELATIVE_MASK: WordType = 0xFF00;
+const ARG_OFFSET: usize = 8;
+const ARG_MASK: WordType = 0xFF00;
 
 macro_rules! get_instruction {
   ($value:ident) => {
@@ -24,9 +24,15 @@ macro_rules! get_register {
   };
 }
 
+macro_rules! get_unsigned_arg {
+  ($value:ident) => {
+    ((($value & ARG_MASK) >> ARG_OFFSET) as u8)
+  };
+}
+
 macro_rules! get_relative {
   ($value:ident) => {
-    (($value & RELATIVE_MASK) >> (16 - RELATIVE_OFFSET)) as i8
+    ((get_unsigned_arg!($value)) as i8)
   };
 }
 
@@ -45,9 +51,15 @@ macro_rules! set_register {
   };
 }
 
+macro_rules! set_unsigned_arg {
+  ($value:expr, $rel:expr) => {
+    ($value | ((($rel as WordType) << ARG_OFFSET) & ARG_MASK))
+  };
+}
+
 macro_rules! set_relative {
   ($value:expr, $rel:expr) => {
-    ($value | ((($rel as WordType) << (16 - RELATIVE_OFFSET)) & RELATIVE_MASK))
+    set_unsigned_arg!($value, $rel)
   };
 }
 
@@ -85,7 +97,7 @@ pub mod codes {
   inst!(CMP_XOR, 16);
   inst!(CMP_NOT, 17);
   inst!(JMP, 18);
-  inst!(UNUSED_1, 19);
+  inst!(INT, 19);
   inst!(UNUSED_2, 20);
   inst!(BSL, 21);
   inst!(BSR, 22);
@@ -123,6 +135,7 @@ pub enum Instruction {
   Xor(u8, u8),
   Not(u8),
   Jump(u8, u8),
+  Interrupt(u8),
   BitShiftLeft(u8, u8),
   BitShiftRight(u8, u8),
   BitNot(u8),
@@ -164,6 +177,7 @@ impl From<WordType> for Instruction {
       CMP_XOR => Instruction::Xor(get_register!(value, 0), get_register!(value, 1)),
       CMP_NOT => Instruction::Not(get_register!(value, 0)),
       JMP => Instruction::Jump(get_register!(value, 0), get_register!(value, 1)),
+      INT => Instruction::Interrupt(get_unsigned_arg!(value)),
       BSL => Instruction::BitShiftLeft(get_register!(value, 0), get_register!(value, 1)),
       BSR => Instruction::BitShiftRight(get_register!(value, 0), get_register!(value, 1)),
       BNOT => Instruction::BitNot(get_register!(value, 0)),
@@ -259,6 +273,7 @@ impl From<&Instruction> for WordType {
         1,
         *flags
       ),
+      Instruction::Interrupt(value) => set_unsigned_arg!(INT, *value),
       Instruction::BitShiftLeft(left, right) => set_register!(
         set_register!(BSL, 0, *left),
         1,
