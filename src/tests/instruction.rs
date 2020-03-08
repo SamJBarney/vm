@@ -64,5 +64,5 @@ fn from_instruction() {
   assert_eq!(0b0000001000111011, WordType::from(Subject::BitNor(1, 1)));
   assert_eq!(0b1111111000011100, WordType::from(Subject::LoadRelative(-2)));
   assert_eq!(0b1111111000111101, WordType::from(Subject::JumpRelative(-2, 1)));
-  assert_eq!(0b0000000100011110, WordType::from(Subject::SaveRelative(1)));
+  assert_eq!(0b0000000100011111, WordType::from(Subject::SaveRelative(1)));
 }
