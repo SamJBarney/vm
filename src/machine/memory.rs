@@ -1,12 +1,23 @@
+use std::sync::Arc;
+use std::sync::RwLock;
 
-use crate::cpu::WordType;
+use super::word::Type as WordType;
+use crate::shared_arc::SharedArc;
+
 
 pub struct Memory {
   mem: Box<[WordType]>,
 }
 
+pub type SharedMemory = SharedArc<Memory>;
+
 impl Memory {
-  pub fn new(size: WordType) -> Self {
+  pub fn new(size: WordType) -> SharedMemory {
+    let mem = Self::new_raw(size);
+    Arc::new(RwLock::new(mem))
+  }
+
+  pub fn new_raw(size: WordType) -> Self {
     Memory {
       mem: vec![0; size as usize].into_boxed_slice()
     }
