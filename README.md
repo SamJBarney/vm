@@ -1,4 +1,4 @@
-![Rust](https://github.com/SamJBarney/vm/workflows/Rust/badge.svg)
+
 # vm
 A custom RISC virtual machine I am writing for an AI project.
 
